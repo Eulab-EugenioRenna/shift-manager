@@ -14,7 +14,7 @@ import {
   withFetch,
   withInterceptors,
 } from '@angular/common/http';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-browser/animations';
 import { MessageService } from 'primeng/api';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
@@ -43,6 +43,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom([BrowserAnimationsModule]),
     MessageService,
     provideAnimationsAsync(),
+    provideAnimations(),
     providePrimeNG({
       ripple: true,
       theme: {

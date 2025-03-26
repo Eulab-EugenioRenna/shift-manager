@@ -2,6 +2,7 @@
   "name": "turni-pdg",
   "version": "0.0.0",
   "scripts": {
+    "deploy": " ng build && firebase deploy && git add . && git commit -m 'deploy' && git push --force",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",

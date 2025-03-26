@@ -1,0 +1,10 @@
+{
+  "hosting": {
+    "public": "dist/turni-pdg/browser",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
