@@ -11,6 +11,8 @@ import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessagesModule } from 'primeng/messages';
 import { MessagesService } from '../../services/messages.service';
+import { AuthService } from '../../services/auth.service';
+import { User } from '../../models/User';
 
 @Component({
   selector: 'app-auth',
@@ -53,7 +55,7 @@ export class AuthComponent  {
     termsAccepted: false
   };
 
-  constructor(private message: MessagesService) { }
+  constructor(private message: MessagesService, private auth: AuthService) { }
 
 
   onLogin(): void {
@@ -65,17 +67,15 @@ export class AuthComponent  {
     this.loading = true;
 
     // Simulazione chiamata API
-    setTimeout(() => {
+    this.auth.signInPassword(this.loginForm.email, this.loginForm.password).then(() => {
       this.loading = false;
-
-      // Qui inserisci la logica di autenticazione reale
-      if (this.loginForm.email === 'demo@example.com' && this.loginForm.password === 'password') {
-        this.showSuccess('Accesso effettuato con successo');
-        // Redirect all'app
-      } else {
-        this.showError('Credenziali non valide');
-      }
-    }, 1500);
+      this.showSuccess('Accesso effettuato con successo');
+    }
+    ).catch((error) => {
+      this.loading = false;
+      this.showError('Errore durante l\'accesso');
+    }
+    );
   }
 
   onSignup(): void {
@@ -98,12 +98,25 @@ export class AuthComponent  {
     this.loading = true;
 
     // Simulazione chiamata API
-    setTimeout(() => {
-      this.loading = false;
-      this.showSuccess('Account creato con successo! Effettua il login per continuare.');
-      this.isSignUp = false;
+    const user: User = {
+      username: this.signupForm.email,
+      email: this.signupForm.email,
+      password: this.signupForm.password,
+      passwordConfirm: this.signupForm.confirmPassword,
+      first_name: this.signupForm.firstName,
+      last_name: this.signupForm.lastName,
+      role: 'volontario'
+    };
+    this.auth.register(user).then(() => {
+      this.showSuccess('Registrazione effettuata con successo');
       this.resetForms();
-    }, 1500);
+    }).catch((error) => {
+
+      this.showError('Errore durante la registrazione');
+    }).finally(() => {
+      this.loading = false;
+      this.isSignUp = false;
+    })
   }
 
   private showSuccess(detail: string): void {
