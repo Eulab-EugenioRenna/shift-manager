@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -10,6 +10,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessagesModule } from 'primeng/messages';
+import { MessagesService } from '../../services/messages.service';
 
 @Component({
   selector: 'app-auth',
@@ -31,9 +32,10 @@ import { MessagesModule } from 'primeng/messages';
         animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
       ]),
     ])
-  ]
+  ],
+  providers: [MessagesService]
 })
-export class AuthComponent implements OnInit {
+export class AuthComponent  {
   isSignUp: boolean = false;
   loading: boolean = false;
 
@@ -51,10 +53,8 @@ export class AuthComponent implements OnInit {
     termsAccepted: false
   };
 
-  constructor() { }
+  constructor(private message: MessagesService) { }
 
-  ngOnInit(): void {
-  }
 
   onLogin(): void {
     if (!this.loginForm.email || !this.loginForm.password) {
@@ -108,10 +108,11 @@ export class AuthComponent implements OnInit {
 
   private showSuccess(detail: string): void {
 
+    this.message.info(detail);
   }
 
   private showError(detail: string): void {
-
+    this.message.error(detail, new Error('Errore'));
   }
 
   private resetForms(): void {

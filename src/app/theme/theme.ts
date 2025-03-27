@@ -1,7 +1,7 @@
-import Aura from "@primeng/themes/aura";
+import Lara from "@primeng/themes/lara";
 import { definePreset } from "@primeng/themes";
 
-const theme = definePreset(Aura, {
+const theme = definePreset(Lara, {
     primitive: {
         borderRadius: {
             none: "0",
