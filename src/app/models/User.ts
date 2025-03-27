@@ -10,3 +10,4 @@ export interface User {
   role: 'admin' | 'leader' | 'volounteer';
   contact?: string;
 }
+
