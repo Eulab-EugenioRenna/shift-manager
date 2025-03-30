@@ -1,0 +1,81 @@
+<div class="bg-primary shadow-md">
+  <div class="container mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo e titolo -->
+      <div class="flex items-center">
+        <a routerLink="/" class="flex items-center text-white font-semibold text-lg">
+          <i class="pi pi-calendar-plus mr-2"></i>
+          <span>Turni PDG</span>
+        </a>
+      </div>
+
+      <!-- Menu desktop -->
+      <div class="hidden md:flex space-x-4">
+        <a routerLink="/home" routerLinkActive="text-white font-medium" class="text-primary-100 hover:text-white px-3 py-2 rounded-md text-sm transition duration-150">Home</a>
+        <a routerLink="/turni" routerLinkActive="text-white font-medium" class="text-primary-100 hover:text-white px-3 py-2 rounded-md text-sm transition duration-150">Gestione Turni</a>
+        <a routerLink="/calendario" routerLinkActive="text-white font-medium" class="text-primary-100 hover:text-white px-3 py-2 rounded-md text-sm transition duration-150">Calendario</a>
+
+        <!-- Menu a tendina PrimeNG -->
+        <p-menu #menu [popup]="true" [model]="items" styleClass="w-48"></p-menu>
+        <button pButton type="button"
+                class="text-primary-100 hover:text-white px-2 py-1 rounded-md text-sm transition duration-150 bg-transparent border-none focus:shadow-none"
+                (click)="menu.toggle($event)">
+          <span class="mr-1">Impostazioni</span>
+          <i class="pi pi-angle-down"></i>
+        </button>
+      </div>
+
+      <!-- Pulsante menu mobile -->
+      <div class="flex md:hidden">
+        <button type="button" pButton pRipple icon="pi pi-bars" (click)="displayMobileMenu = true"
+                class="bg-transparent border-none text-white p-2 focus:shadow-none"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu mobile con PrimeNG Sidebar -->
+  <p-sidebar [(visible)]="displayMobileMenu" position="right" styleClass="w-64">
+    <h3 class="font-medium text-lg mb-4 flex items-center">
+      <i class="pi pi-calendar-plus mr-2"></i>
+      Turni PDG
+    </h3>
+    <div class="flex flex-col space-y-2">
+      <a routerLink="/home" routerLinkActive="text-primary font-medium"
+         class="px-3 py-2 hover:bg-gray-100 rounded-md transition duration-150"
+         (click)="displayMobileMenu = false">
+        <i class="pi pi-home mr-2"></i>Home
+      </a>
+      <a routerLink="/turni" routerLinkActive="text-primary font-medium"
+         class="px-3 py-2 hover:bg-gray-100 rounded-md transition duration-150"
+         (click)="displayMobileMenu = false">
+        <i class="pi pi-calendar mr-2"></i>Gestione Turni
+      </a>
+      <a routerLink="/calendario" routerLinkActive="text-primary font-medium"
+         class="px-3 py-2 hover:bg-gray-100 rounded-md transition duration-150"
+         (click)="displayMobileMenu = false">
+        <i class="pi pi-table mr-2"></i>Calendario
+      </a>
+
+      <div class="border-t border-gray-200 my-2 py-2">
+        <p class="px-3 text-gray-500 text-xs uppercase font-medium mb-2">Impostazioni</p>
+        <a routerLink="/profilo" routerLinkActive="text-primary font-medium"
+           class="px-3 py-2 hover:bg-gray-100 rounded-md transition duration-150"
+           (click)="displayMobileMenu = false">
+          <i class="pi pi-user mr-2"></i>Profilo
+        </a>
+        <a routerLink="/preferenze" routerLinkActive="text-primary font-medium"
+           class="px-3 py-2 hover:bg-gray-100 rounded-md transition duration-150"
+           (click)="displayMobileMenu = false">
+          <i class="pi pi-cog mr-2"></i>Preferenze
+        </a>
+        <a routerLink="/admin" routerLinkActive="text-primary font-medium"
+           class="px-3 py-2 hover:bg-gray-100 rounded-md transition duration-150"
+           (click)="displayMobileMenu = false">
+          <i class="pi pi-shield mr-2"></i>Amministrazione
+        </a>
+      </div>
+
+
+    </div>
+  </p-sidebar>
+</div>

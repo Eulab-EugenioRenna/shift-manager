@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 
 // PrimeNG Components
@@ -55,7 +55,7 @@ export class AuthComponent  {
     termsAccepted: false
   };
 
-  constructor(private message: MessagesService, private auth: AuthService) { }
+  constructor(private message: MessagesService, private auth: AuthService,private router: Router) { }
 
 
   onLogin(): void {
@@ -63,13 +63,11 @@ export class AuthComponent  {
       this.showError('Inserisci email e password per accedere');
       return;
     }
-
     this.loading = true;
-
-    // Simulazione chiamata API
     this.auth.signInPassword(this.loginForm.email, this.loginForm.password).then(() => {
       this.loading = false;
       this.showSuccess('Accesso effettuato con successo');
+      this.router.navigate(['']);
     }
     ).catch((error) => {
       this.loading = false;
