@@ -10,6 +10,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessagesModule } from 'primeng/messages';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+
 import { MessagesService } from '../../services/messages.service';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../models/User';
@@ -24,7 +27,10 @@ import { User } from '../../models/User';
     InputTextModule,
     PasswordModule,
     CheckboxModule,
-    MessagesModule],
+    MessagesModule,
+    InputGroupModule,
+    InputGroupAddonModule
+  ],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.scss',
   animations: [
