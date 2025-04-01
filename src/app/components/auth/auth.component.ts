@@ -103,12 +103,12 @@ export class AuthComponent  {
 
     // Simulazione chiamata API
     const user: User = {
-      username: this.signupForm.email,
       email: this.signupForm.email,
       password: this.signupForm.password,
       passwordConfirm: this.signupForm.confirmPassword,
       first_name: this.signupForm.firstName,
       last_name: this.signupForm.lastName,
+      name: this.signupForm.firstName + ' ' + this.signupForm.lastName,
       role: 'volontario'
     };
     this.auth.register(user).then(() => {

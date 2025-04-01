@@ -1,0 +1,147 @@
+<div class="flex h-screen bg-gray-50">
+  <!-- Sidebar a sinistra -->
+  <div class="w-64 h-full bg-white border-r border-gray-200 flex flex-col pt-2">
+    <!-- Header della sidebar -->
+    <div class="px-4 py-2 flex items-center justify-between border-b border-gray-200 pb-2">
+      <h2 class="text-lg font-semibold text-gray-800">Calendari</h2>
+      <button pButton icon="pi pi-plus" class="p-button-rounded p-button-text p-button-sm"></button>
+    </div>
+
+
+
+    <!-- Elenco categorie eventi -->
+    <div class="px-4 py-2 mt-2">
+      <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">I Miei Calendari</h3>
+      <ul class="space-y-1">
+        <li *ngFor="let category of eventCategories" class="flex items-center py-1">
+          <div class="w-3 h-3 rounded-full mr-2" [ngStyle]="{'background-color': category.color}"></div>
+          <p-checkbox [(ngModel)]="category.visible" [binary]="true" inputId="category{{category.id}}"></p-checkbox>
+          <label for="category{{category.id}}" class="ml-2 text-sm text-gray-700">{{category.name}}</label>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Elenco prossimi eventi -->
+    <div class="px-4 py-2 mt-2 flex-grow overflow-auto">
+      <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Prossimi Eventi</h3>
+      <ul class="space-y-1">
+        <li *ngFor="let event of upcomingEvents"
+            class="py-2 px-2 rounded-md cursor-pointer hover:bg-gray-100"
+            (click)="showEventDetails(event)">
+          <div class="flex items-start">
+            <div class="w-2 h-full rounded-full mr-2 mt-1" [ngStyle]="{'background-color': getEventColor(event)}"></div>
+            <div>
+              <div class="text-sm font-medium text-gray-800">{{event.title}}</div>
+              <div class="text-xs text-gray-500">{{formatEventDate(event)}}</div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Contenitore principale calendario -->
+  <div class="flex-1 flex flex-col h-full">
+    <!-- Header con navigazione e controlli -->
+    <div class="flex justify-between items-center p-2 bg-white border-b">
+      <div class="flex space-x-2">
+        <button pButton icon="pi pi-chevron-left" class="p-button-rounded p-button-text" (click)="navigatePrevious()"></button>
+        <button pButton icon="pi pi-chevron-right" class="p-button-rounded p-button-text" (click)="navigateNext()"></button>
+        <button pButton label="Oggi" class="p-button-text font-medium ml-1" (click)="goToToday()"></button>
+      </div>
+
+      <div class="text-xl font-bold text-gray-800">
+        {{ currentViewTitle }}
+      </div>
+
+
+    </div>
+
+    <!-- Contenitore calendario -->
+    <div class="flex-grow overflow-auto">
+      <!-- Vista mensile -->
+      <div  class="h-full">
+        <div class="grid grid-cols-7 text-center py-2 bg-gray-50 border-b">
+          <div *ngFor="let day of weekDays" class="font-medium text-gray-700 text-sm">{{ day }}</div>
+        </div>
+
+        <div class="grid grid-cols-7 h-[calc(100%-2.5rem)]" style="grid-auto-rows: 1fr;">
+          <div *ngFor="let date of monthDates"
+               [ngClass]="{'bg-gray-50/80': !isCurrentMonth(date), 'bg-blue-50/30': isToday(date)}"
+               class="border border-gray-200/70 p-1 overflow-hidden relative transition hover:bg-gray-100/70 cursor-pointer">
+
+            <div class="flex justify-between items-center">
+              <div [ngClass]="isToday(date) ? 'relative' : ''">
+                <span [ngClass]="{'font-medium': isCurrentMonth(date), 'text-gray-400': !isCurrentMonth(date), 'text-blue-600': isToday(date), 'h-5 w-5 flex items-center justify-center rounded-full bg-blue-500 text-white': isToday(date)}" class="text-xs">
+                  {{ date.getDate() }}
+                </span>
+
+              </div>
+              <div *ngIf="isToday(date)" class="text-xs text-blue-600 font-medium">Oggi</div>
+            </div>
+
+            <!-- Eventi del giorno -->
+            <div class="mt-1 space-y-1 max-h-[90%] overflow-hidden">
+              <div *ngFor="let event of getEventsForDate(date)"
+                   class="text-xs px-1 py-0.5 rounded truncate cursor-pointer"
+                   [ngStyle]="{'background-color': event.color + '40', 'color': event.color}"
+                   (click)="showEventDetails(event, $event)">
+                {{ event.title }}
+              </div>
+
+              <div *ngIf="getEventsForDate(date).length > 3" class="text-xs text-gray-500 px-1">
+                +{{ getEventsForDate(date).length - 3 }} altri
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dialog per i dettagli dell'evento -->
+    <p-dialog [(visible)]="showDialog" [style]="{width: '450px'}" [modal]="true" [draggable]="false" [resizable]="false">
+      <ng-template pTemplate="header">
+        <div class="flex items-center">
+          <div class="w-3 h-3 rounded-full mr-2" [ngStyle]="{'background-color': selectedEvent?.color}"></div>
+          <span>{{ selectedEvent?.title }}</span>
+        </div>
+      </ng-template>
+
+      <div *ngIf="selectedEvent" class="p-2">
+        <div class="mb-4">
+          <div class="flex items-center mb-2">
+            <i class="pi pi-calendar mr-2 text-gray-500"></i>
+            <span>{{ formatEventDate(selectedEvent) }}</span>
+          </div>
+          <div class="flex items-start mb-2">
+            <i class="pi pi-info-circle mr-2 text-gray-500 mt-1"></i>
+            <span>{{ selectedEvent.description }}</span>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <h3 class="font-medium mb-2 text-gray-700">Servizi</h3>
+          <p-accordion [multiple]="true">
+            <p-accordionTab *ngFor="let service of selectedEvent.services" [header]="service.name">
+              <div class="mb-2">
+                <div class="font-medium text-sm mb-1">Leader</div>
+                <div class="flex items-center mb-2 bg-blue-50 p-2 rounded">
+                  <i class="pi pi-user mr-2 text-blue-500"></i>
+                  <span>{{ service.leader.name }}</span>
+                </div>
+
+                <div class="font-medium text-sm mb-1">Volontari</div>
+                <ul class="space-y-1">
+                  <li *ngFor="let volunteer of service.volunteers" class="flex items-center p-2 bg-gray-50 rounded">
+                    <i class="pi pi-user mr-2 text-gray-500"></i>
+                    <span>{{ volunteer.name }}</span>
+                  </li>
+                </ul>
+              </div>
+            </p-accordionTab>
+          </p-accordion>
+        </div>
+      </div>
+    </p-dialog>
+  </div>
+</div>

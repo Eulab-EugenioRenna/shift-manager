@@ -5,7 +5,13 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./pages/fullwidth/fullwidth.component').then(m => m.FullwidthComponent),
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'calendario',
+        loadComponent: () => import('./components/calendar/calendar.component').then(m => m.CalendarComponent)
+      }
+    ]
   },
   {
     path: 'auth',
