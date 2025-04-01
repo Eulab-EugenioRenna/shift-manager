@@ -99,49 +99,83 @@
     </div>
 
     <!-- Dialog per i dettagli dell'evento -->
-    <p-dialog [(visible)]="showDialog" [style]="{width: '450px'}" [modal]="true" [draggable]="false" [resizable]="false">
+    <p-dialog [(visible)]="showDialog"
+              [style]="{width: '520px'}"
+              [modal]="true"
+              [draggable]="false"
+              [resizable]="false"
+              (onHide)="onDialogHide()">
       <ng-template pTemplate="header">
         <div class="flex items-center">
           <div class="w-3 h-3 rounded-full mr-2" [ngStyle]="{'background-color': selectedEvent?.color}"></div>
-          <span>{{ selectedEvent?.title }}</span>
+          <span class="text-lg font-medium">{{ selectedEvent?.title }}</span>
         </div>
       </ng-template>
 
-      <div *ngIf="selectedEvent" class="p-2">
-        <div class="mb-4">
-          <div class="flex items-center mb-2">
-            <i class="pi pi-calendar mr-2 text-gray-500"></i>
-            <span>{{ formatEventDate(selectedEvent) }}</span>
+      <div *ngIf="selectedEvent" class="p-3">
+        <!-- Informazioni sull'evento -->
+        <div class="mb-4 bg-gray-50 p-3 rounded-lg">
+          <div class="flex justify-between">
+            <div class="flex items-center">
+              <i class="pi pi-calendar mr-2 text-gray-500"></i>
+              <span>{{ formatEventDate(selectedEvent) }}</span>
+            </div>
+            <div class="text-xs px-2 py-1 rounded-full" [ngStyle]="{'background-color': selectedEvent.color + '30', 'color': selectedEvent.color}">
+              {{ selectedEvent.title }}
+            </div>
           </div>
-          <div class="flex items-start mb-2">
+          <div class="flex items-start mt-2">
             <i class="pi pi-info-circle mr-2 text-gray-500 mt-1"></i>
             <span>{{ selectedEvent.description }}</span>
           </div>
         </div>
 
-        <div class="mt-4">
-          <h3 class="font-medium mb-2 text-gray-700">Servizi</h3>
-          <p-accordion [multiple]="true">
-            <p-accordionTab *ngFor="let service of selectedEvent.services" [header]="service.name">
-              <div class="mb-2">
-                <div class="font-medium text-sm mb-1">Leader</div>
-                <div class="flex items-center mb-2 bg-blue-50 p-2 rounded">
-                  <i class="pi pi-user mr-2 text-blue-500"></i>
-                  <span>{{ service.leader.name }}</span>
-                </div>
+        <!-- Sezione servizi -->
+        <div>
+          <h3 class="font-medium text-lg mb-3 pb-1 border-b border-gray-200 text-gray-700">Servizi</h3>
 
-                <div class="font-medium text-sm mb-1">Volontari</div>
-                <ul class="space-y-1">
-                  <li *ngFor="let volunteer of service.volunteers" class="flex items-center p-2 bg-gray-50 rounded">
-                    <i class="pi pi-user mr-2 text-gray-500"></i>
-                    <span>{{ volunteer.name }}</span>
-                  </li>
-                </ul>
+          <!-- Lista servizi in grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div *ngFor="let service of selectedEvent.services" class="border border-gray-200 rounded-lg overflow-hidden h-full">
+              <!-- Intestazione servizio -->
+              <div class="bg-gray-100 p-2 border-b border-gray-200">
+                <h4 class="font-medium text-sm">{{ service.name }}</h4>
               </div>
-            </p-accordionTab>
-          </p-accordion>
+
+              <!-- Contenuto servizio compatto -->
+              <div class="p-2">
+                <!-- Leader e volontari insieme -->
+                <div>
+                  <!-- Leader -->
+                  <div class="mb-2">
+                    <div class="text-xs font-medium text-gray-600 mb-1">Leader</div>
+                    <div class="flex items-center bg-blue-50 p-1.5 rounded text-sm">
+                      <i class="pi pi-user mr-1.5 text-blue-500"></i>
+                      <span>{{ service.leader?.name || 'Non assegnato' }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Volontari -->
+                  <div>
+                    <div class="text-xs font-medium text-gray-600 mb-1">Volontari</div>
+                    <ul class="space-y-1">
+                      <li *ngFor="let volunteer of service.volunteers" class="flex items-center p-1.5 bg-gray-50 rounded text-sm">
+                        <i class="pi pi-user mr-1.5 text-gray-500"></i>
+                        <span>{{ volunteer.name }}</span>
+                      </li>
+                      <li *ngIf="!service.volunteers?.length" class="text-xs text-gray-500 italic p-1.5">
+                        Nessun volontario assegnato
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+
     </p-dialog>
   </div>
 </div>

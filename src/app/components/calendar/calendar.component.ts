@@ -8,7 +8,6 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { CalendarModule } from 'primeng/calendar';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
-import { AccordionModule } from 'primeng/accordion';
 
 // Models
 import { Event, EventCategory } from '../../models/Event';
@@ -26,7 +25,7 @@ import { Service } from '../../models/Service';
     CalendarModule,
     CheckboxModule,
     DialogModule,
-    AccordionModule
+    
   ],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss']
@@ -34,15 +33,11 @@ import { Service } from '../../models/Service';
 export class CalendarComponent implements OnInit {
   // Dati di base calendario
   currentDate: Date = new Date();
-  datePicker: Date = new Date();
   currentView: string = 'month';
 
 
   weekDays: string[] = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
-  hours: number[] = Array.from({ length: 24 }, (_, i) => i);
-
   monthDates: Date[] = [];
-  weekDates: Date[] = [];
 
   // Eventi e categorie
   events: Event[] = [];
@@ -58,22 +53,6 @@ export class CalendarComponent implements OnInit {
       month: 'long',
       year: 'numeric'
     };
-
-    if (this.currentView === 'week') {
-      const startDate = this.weekDates[0];
-      const endDate = this.weekDates[6];
-
-      if (!startDate || !endDate) return '';
-
-      if (startDate.getMonth() === endDate.getMonth()) {
-        return `${startDate.getDate()} - ${endDate.getDate()} ${startDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })}`;
-      } else if (startDate.getFullYear() === endDate.getFullYear()) {
-        return `${startDate.getDate()} ${startDate.toLocaleDateString('it-IT', { month: 'long' })} - ${endDate.getDate()} ${endDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })}`;
-      } else {
-        return `${startDate.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })} - ${endDate.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })}`;
-      }
-    }
-
     return this.currentDate.toLocaleDateString('it-IT', options);
   }
 
@@ -94,7 +73,7 @@ export class CalendarComponent implements OnInit {
       { id: "4", name: 'Comunità', color: '#6A0572', visible: true }
     ];
 
-    // Usere
+    // User
     const Usere: User[] = [
       {
         id: "1", name: 'Mario Rossi',
@@ -311,54 +290,7 @@ export class CalendarComponent implements OnInit {
       }
     ];
 
-    // Aggiungiamo altri eventi nell'arco di 3 mesi
-    for (let i = 0; i < 20; i++) {
-      const randomDay = Math.floor(Math.random() * 90) - 30; // Da -30 a +60 giorni
-      const randomCategoryId = Math.floor(Math.random() * 4) + 1;
-      const category = this.eventCategories.find(c => c.id === randomCategoryId.toString());
-      const randomHour = Math.floor(Math.random() * 12) + 8; // 8:00 - 20:00
-      const randomDuration = Math.floor(Math.random() * 3) + 1; // 1-3 ore
 
-      const start = new Date(currentYear, currentMonth, now.getDate() + randomDay, randomHour, 0);
-      const end = new Date(start);
-      end.setHours(start.getHours() + randomDuration);
-
-      const randomServiceCount = Math.floor(Math.random() * 3) + 1;
-      const services: Service[] = [];
-
-      for (let j = 0; j < randomServiceCount; j++) {
-        const randomLeaderIndex = Math.floor(Math.random() * Usere.length);
-        const randomVolunteerCount = Math.floor(Math.random() * 4) + 1;
-        const volunteers: User[] = [];
-
-        for (let k = 0; k < randomVolunteerCount; k++) {
-          let randomVolunteerIndex;
-          do {
-            randomVolunteerIndex = Math.floor(Math.random() * Usere.length);
-          } while (randomVolunteerIndex === randomLeaderIndex);
-
-          volunteers.push(Usere[randomVolunteerIndex]);
-        }
-
-        services.push({
-          id: "1000" + i * 10 + j,
-          name: `Servizio ${j + 1}`,
-          leader: Usere[randomLeaderIndex],
-          volunteers: volunteers
-        });
-      }
-
-      this.events.push({
-        id: "10" + i,
-        title: `Evento ${i + 6}`,
-        start,
-        end,
-        color: category?.color || '#999',
-        description: `Descrizione dell'evento ${i + 6}`,
-        categoryId: "randomCategoryId",
-        services
-      });
-    }
   }
 
   generateCalendarData(): void {
@@ -442,7 +374,6 @@ export class CalendarComponent implements OnInit {
   }
 
   getEventsForDate(date: Date): Event[] {
-    // Filtriamo gli eventi per la data specificata
     const dayStart = new Date(date);
     dayStart.setHours(0, 0, 0, 0);
 
@@ -451,10 +382,20 @@ export class CalendarComponent implements OnInit {
 
     return this.events
       .filter(event => {
-        return event.start >= dayStart && event.start <= dayEnd &&
-               this.eventCategories.find(c => c.id === event.categoryId)?.visible;
+        // Un evento è nella data se:
+        // 1. Inizia in questa data, OPPURE
+        // 2. Finisce in questa data, OPPURE
+        // 3. È in corso (iniziato prima e finisce dopo questa data)
+        return (
+          // Evento che inizia in questo giorno
+          (event.start >= dayStart && event.start <= dayEnd) ||
+          // Evento che finisce in questo giorno
+          (event.end >= dayStart && event.end <= dayEnd) ||
+          // Evento in corso (iniziato prima e finisce dopo)
+          (event.start < dayStart && event.end > dayEnd)
+        ) && this.eventCategories.find(c => c.id === event.categoryId)?.visible;
       })
-      .slice(0, 4); // Limitiamo a 3 eventi visibili + "più altri"
+      .slice(0, 4); // Limitiamo a 4 eventi visibili
   }
 
   updateUpcomingEvents(): void {
@@ -471,9 +412,23 @@ export class CalendarComponent implements OnInit {
     if ($event) {
       $event.stopPropagation();
     }
-
     this.selectedEvent = event;
     this.showDialog = true;
+  }
+
+  /**
+   * Gestisce la chiusura del dialog
+   */
+  closeDialog(): void {
+    this.showDialog = false;
+  }
+
+  /**
+   * Gestisce l'evento onHide del dialog
+   * Pulisce l'evento selezionato quando il dialog viene chiuso
+   */
+  onDialogHide(): void {
+    this.selectedEvent = null;
   }
 
   formatEventDate(event: Event): string {
