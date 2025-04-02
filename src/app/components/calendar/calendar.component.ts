@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 // PrimeNG Modules
@@ -25,16 +25,15 @@ import { Service } from '../../models/Service';
     CalendarModule,
     CheckboxModule,
     DialogModule,
-    
+
   ],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss']
 })
-export class CalendarComponent implements OnInit {
+export class CalendarComponent implements OnInit, OnDestroy {
   // Dati di base calendario
   currentDate: Date = new Date();
   currentView: string = 'month';
-
 
   weekDays: string[] = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
   monthDates: Date[] = [];
@@ -47,6 +46,11 @@ export class CalendarComponent implements OnInit {
   // Dialog
   showDialog: boolean = false;
   selectedEvent: Event | null = null;
+
+  // Mobile e Sidebar
+  isMobile = false;
+  isSidebarOpen = false;
+  showAllEvents = false;
 
   get currentViewTitle(): string {
     const options: Intl.DateTimeFormatOptions = {
@@ -62,6 +66,33 @@ export class CalendarComponent implements OnInit {
     this.loadMockData();
     this.generateCalendarData();
     this.updateUpcomingEvents();
+
+    // Controlla se è un dispositivo mobile
+    this.checkIfMobile();
+
+    // Gestisci il ridimensionamento della finestra
+    window.addEventListener('resize', () => {
+      this.checkIfMobile();
+    });
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('resize', () => {
+      this.checkIfMobile();
+    });
+  }
+
+  private checkIfMobile(): void {
+    this.isMobile = window.innerWidth < 768; // 768px è la breakpoint per md in Tailwind
+
+    // Se non è mobile, assicurati che la sidebar sia sempre visibile
+    if (!this.isMobile) {
+      this.isSidebarOpen = true;
+    }
+  }
+
+  toggleSidebar(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
   }
 
   loadMockData(): void {

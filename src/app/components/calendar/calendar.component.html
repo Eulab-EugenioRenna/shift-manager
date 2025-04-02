@@ -1,13 +1,16 @@
-<div class="flex h-screen bg-gray-50">
-  <!-- Sidebar a sinistra -->
-  <div class="w-64 h-full bg-white border-r border-gray-200 flex flex-col pt-2">
+<div class="flex flex-col md:flex-row h-screen bg-gray-50">
+  <!-- Sidebar a sinistra (nascosta di default su mobile) -->
+  <div class="sidebar-container transition-all duration-300 md:w-64 h-auto md:h-full bg-white border-r border-gray-200 flex flex-col pt-2"
+       [ngClass]="{'w-full h-full absolute z-10': isSidebarOpen && isMobile, 'w-0 hidden md:block': !isSidebarOpen && isMobile, 'w-64': !isMobile}">
     <!-- Header della sidebar -->
     <div class="px-4 py-2 flex items-center justify-between border-b border-gray-200 pb-2">
       <h2 class="text-lg font-semibold text-gray-800">Calendari</h2>
-      <button pButton icon="pi pi-plus" class="p-button-rounded p-button-text p-button-sm"></button>
+      <div class="flex items-center space-x-2">
+        <button pButton icon="pi pi-plus" class="p-button-rounded p-button-text p-button-sm"></button>
+        <button pButton *ngIf="isMobile" icon="pi pi-times" class="p-button-rounded p-button-text p-button-sm"
+                (click)="toggleSidebar()"></button>
+      </div>
     </div>
-
-
 
     <!-- Elenco categorie eventi -->
     <div class="px-4 py-2 mt-2">
@@ -41,28 +44,35 @@
   </div>
 
   <!-- Contenitore principale calendario -->
-  <div class="flex-1 flex flex-col h-full">
+  <div class="flex-1 flex flex-col h-full overflow-hidden">
     <!-- Header con navigazione e controlli -->
     <div class="flex justify-between items-center p-2 bg-white border-b">
-      <div class="flex space-x-2">
+      <div class="flex space-x-1 md:space-x-2">
+        <!-- Pulsante per aprire sidebar su mobile -->
+        <button pButton *ngIf="isMobile" icon="pi pi-bars" class="p-button-rounded p-button-text"
+                (click)="toggleSidebar()"></button>
+
         <button pButton icon="pi pi-chevron-left" class="p-button-rounded p-button-text" (click)="navigatePrevious()"></button>
         <button pButton icon="pi pi-chevron-right" class="p-button-rounded p-button-text" (click)="navigateNext()"></button>
-        <button pButton label="Oggi" class="p-button-text font-medium ml-1" (click)="goToToday()"></button>
+        <button pButton label="Oggi" class="p-button-text font-medium ml-1 text-xs md:text-sm" (click)="goToToday()"></button>
       </div>
 
-      <div class="text-xl font-bold text-gray-800">
+      <div class="text-base md:text-xl font-bold text-gray-800 truncate">
         {{ currentViewTitle }}
       </div>
-
-
     </div>
 
     <!-- Contenitore calendario -->
     <div class="flex-grow overflow-auto">
       <!-- Vista mensile -->
-      <div  class="h-full">
+      <div class="h-full">
         <div class="grid grid-cols-7 text-center py-2 bg-gray-50 border-b">
-          <div *ngFor="let day of weekDays" class="font-medium text-gray-700 text-sm">{{ day }}</div>
+          <div *ngFor="let day of weekDays" class="font-medium text-gray-700 text-xs md:text-sm">
+            <!-- Versione abbreviata per mobile -->
+            <span class="md:hidden">{{ day.substring(0, 1) }}</span>
+            <!-- Versione completa per desktop -->
+            <span class="hidden md:inline">{{ day }}</span>
+          </div>
         </div>
 
         <div class="grid grid-cols-7 h-[calc(100%-2.5rem)]" style="grid-auto-rows: 1fr;">
@@ -70,27 +80,28 @@
                [ngClass]="{'bg-gray-50/80': !isCurrentMonth(date), 'bg-blue-50/30': isToday(date)}"
                class="border border-gray-200/70 p-1 overflow-hidden relative transition hover:bg-gray-100/70 cursor-pointer">
 
+            <!-- Data ridisegnata con stile responsive -->
             <div class="flex justify-between items-center">
               <div [ngClass]="isToday(date) ? 'relative' : ''">
                 <span [ngClass]="{'font-medium': isCurrentMonth(date), 'text-gray-400': !isCurrentMonth(date), 'text-blue-600': isToday(date), 'h-5 w-5 flex items-center justify-center rounded-full bg-blue-500 text-white': isToday(date)}" class="text-xs">
                   {{ date.getDate() }}
                 </span>
-
               </div>
-              <div *ngIf="isToday(date)" class="text-xs text-blue-600 font-medium">Oggi</div>
+              <div *ngIf="isToday(date)" class="text-xs text-blue-600 font-medium hidden md:block">Oggi</div>
             </div>
 
-            <!-- Eventi del giorno -->
+            <!-- Eventi del giorno con gestione migliorata per mobile -->
             <div class="mt-1 space-y-1 max-h-[90%] overflow-hidden">
-              <div *ngFor="let event of getEventsForDate(date)"
-                   class="text-xs px-1 py-0.5 rounded truncate cursor-pointer"
-                   [ngStyle]="{'background-color': event.color + '40', 'color': event.color}"
-                   (click)="showEventDetails(event, $event)">
+              <div *ngFor="let event of getEventsForDate(date); let i = index"
+                  [ngClass]="{'hidden': i >= (isMobile ? 1 : 3) && !showAllEvents}"
+                  class="text-xs px-1 py-0.5 rounded truncate cursor-pointer"
+                  [ngStyle]="{'background-color': event.color + '40', 'color': event.color}"
+                  (click)="showEventDetails(event, $event)">
                 {{ event.title }}
               </div>
 
-              <div *ngIf="getEventsForDate(date).length > 3" class="text-xs text-gray-500 px-1">
-                +{{ getEventsForDate(date).length - 3 }} altri
+              <div *ngIf="getEventsForDate(date).length > (isMobile ? 1 : 3)" class="text-xs text-gray-500 px-1">
+                +{{ getEventsForDate(date).length - (isMobile ? 1 : 3) }} altri
               </div>
             </div>
           </div>
@@ -100,7 +111,7 @@
 
     <!-- Dialog per i dettagli dell'evento -->
     <p-dialog [(visible)]="showDialog"
-              [style]="{width: '520px'}"
+              [style]="{width: '90vw', maxWidth: '520px'}"
               [modal]="true"
               [draggable]="false"
               [resizable]="false"
@@ -108,19 +119,19 @@
       <ng-template pTemplate="header">
         <div class="flex items-center">
           <div class="w-3 h-3 rounded-full mr-2" [ngStyle]="{'background-color': selectedEvent?.color}"></div>
-          <span class="text-lg font-medium">{{ selectedEvent?.title }}</span>
+          <span class="text-lg font-medium truncate">{{ selectedEvent?.title }}</span>
         </div>
       </ng-template>
 
       <div *ngIf="selectedEvent" class="p-3">
         <!-- Informazioni sull'evento -->
         <div class="mb-4 bg-gray-50 p-3 rounded-lg">
-          <div class="flex justify-between">
+          <div class="flex flex-col sm:flex-row sm:justify-between">
             <div class="flex items-center">
               <i class="pi pi-calendar mr-2 text-gray-500"></i>
               <span>{{ formatEventDate(selectedEvent) }}</span>
             </div>
-            <div class="text-xs px-2 py-1 rounded-full" [ngStyle]="{'background-color': selectedEvent.color + '30', 'color': selectedEvent.color}">
+            <div class="text-xs px-2 py-1 rounded-full mt-2 sm:mt-0" [ngStyle]="{'background-color': selectedEvent.color + '30', 'color': selectedEvent.color}">
               {{ selectedEvent.title }}
             </div>
           </div>
@@ -174,8 +185,6 @@
           </div>
         </div>
       </div>
-
-
     </p-dialog>
   </div>
 </div>
