@@ -96,7 +96,12 @@
                   [ngClass]="{'hidden': i >= (isMobile ? 1 : 3) && !showAllEvents}"
                   class="text-xs px-1 py-0.5 rounded truncate cursor-pointer"
                   [ngStyle]="{'background-color': event.color + '40', 'color': event.color}"
-                  (click)="showEventDetails(event, $event)">
+                  (click)="showEventDetails(event, $event)"
+                  [pTooltip]="event.title + (event.description ? ' - ' + event.description : '')"
+                  tooltipPosition="top"
+                  [tooltipStyleClass]="'event-tooltip'"
+                  [escape]="false"
+                  tooltipZIndex="9999">
                 {{ event.title }}
               </div>
 

@@ -28,5 +28,15 @@
     }
   }
 
- 
+  /* Stili per il tooltip degli eventi */
+  .event-tooltip {
+    max-width: 250px;
+    word-wrap: break-word;
+    white-space: normal;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    padding: 0.5rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
 }

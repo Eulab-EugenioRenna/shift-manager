@@ -8,11 +8,11 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { CalendarModule } from 'primeng/calendar';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
+import { TooltipModule } from 'primeng/tooltip';
 
 // Models
 import { Event, EventCategory } from '../../models/Event';
 import { User } from '../../models/User';
-import { Service } from '../../models/Service';
 
 @Component({
   selector: 'app-calendar',
@@ -25,7 +25,7 @@ import { Service } from '../../models/Service';
     CalendarModule,
     CheckboxModule,
     DialogModule,
-
+    TooltipModule
   ],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss']
