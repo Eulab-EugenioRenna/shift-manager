@@ -98,7 +98,7 @@
                   [ngStyle]="{'background-color': event.color + '40', 'color': event.color}"
                   (dblclick)="showEventDetails(event, $event)"
                   [pTooltipFixed]="event.title + (event.description ? ' - ' + event.description : '')"
-                  tooltipEvent="both"
+                  tooltipEvent="hover"
                   tooltipPosition="top"
                   [tooltipStyleClass]="'event-tooltip'"
                   tooltipZIndex="9999">
