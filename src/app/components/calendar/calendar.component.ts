@@ -13,6 +13,7 @@ import { TooltipModule } from 'primeng/tooltip';
 // Models
 import { Event, EventCategory } from '../../models/Event';
 import { User } from '../../models/User';
+import { FixedTooltipDirective } from '../../directives/fixed-tooltip.directive';
 
 @Component({
   selector: 'app-calendar',
@@ -25,7 +26,7 @@ import { User } from '../../models/User';
     CalendarModule,
     CheckboxModule,
     DialogModule,
-    TooltipModule
+    FixedTooltipDirective
   ],
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss']
