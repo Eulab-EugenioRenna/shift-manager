@@ -3,7 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
+import { MessagesService } from '../../services/messages.service';
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -55,7 +56,7 @@ interface ExtendedService extends Service {
   ],
   templateUrl: './teams.component.html',
   styleUrls: ['./teams.component.scss'],
-  providers: [ConfirmationService, MessageService]
+  providers: [ConfirmationService]
 })
 export class TeamsComponent implements OnInit {
   // Dati
@@ -115,7 +116,7 @@ export class TeamsComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService
+    private messagesService: MessagesService
   ) {
     this.serviceForm = this.fb.group({
       name: ['', Validators.required],
@@ -175,11 +176,7 @@ export class TeamsComponent implements OnInit {
           status: formValue.status
         };
 
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Operazione completata',
-          detail: 'Servizio aggiornato con successo'
-        });
+        this.messagesService.info('Servizio aggiornato con successo');
       }
     } else {
       // Crea nuovo servizio
@@ -194,11 +191,7 @@ export class TeamsComponent implements OnInit {
       };
 
       this.services.push(newService);
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Operazione completata',
-        detail: 'Nuovo servizio creato'
-      });
+      this.messagesService.info('Nuovo servizio creato');
     }
 
     this.serviceDialogVisible = false;
@@ -212,11 +205,7 @@ export class TeamsComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.services = this.services.filter(s => s.id !== service.id);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Operazione completata',
-          detail: 'Servizio eliminato'
-        });
+        this.messagesService.info('Servizio eliminato');
         this.applyFilters();
       }
     });
@@ -234,11 +223,7 @@ export class TeamsComponent implements OnInit {
       const index = this.services.findIndex(s => s.id === this.editingService!.id);
       if (index !== -1) {
         this.services[index].leader = { ...volunteer };
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Team Leader',
-          detail: `${volunteer.first_name} ${volunteer.last_name} assegnato come Team Leader`
-        });
+        this.messagesService.info(`${volunteer.first_name} ${volunteer.last_name} assegnato come Team Leader`);
       }
     }
     this.teamLeaderDialogVisible = false;
@@ -275,11 +260,7 @@ export class TeamsComponent implements OnInit {
 
         this.services[index].volunteers.push(volunteerWithRole);
 
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Volontario aggiunto',
-          detail: `${volunteer.first_name} ${volunteer.last_name} aggiunto al servizio`
-        });
+        this.messagesService.info(`${volunteer.first_name} ${volunteer.last_name} aggiunto al servizio`);
 
         // Aggiorna la lista dei volontari disponibili
         this.availableVolunteersForService = this.availableVolunteersForService.filter(
@@ -307,11 +288,7 @@ export class TeamsComponent implements OnInit {
             v => v.id !== volunteer.id
           );
 
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Volontario rimosso',
-            detail: `${volunteer.first_name} ${volunteer.last_name} rimosso dal servizio`
-          });
+          this.messagesService.info(`${volunteer.first_name} ${volunteer.last_name} rimosso dal servizio`);
           this.applyFilters();
         }
       }
@@ -331,11 +308,7 @@ export class TeamsComponent implements OnInit {
 
   openVolunteerModal(): void {
     // Questa funzionalità sarà implementata in un altro componente
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Funzionalità esterna',
-      detail: 'La gestione dettagliata dei volontari sarà implementata in un altro componente'
-    });
+    this.messagesService.info('La gestione dettagliata dei volontari sarà implementata in un altro componente');
   }
 
   applyFilters(): void {
