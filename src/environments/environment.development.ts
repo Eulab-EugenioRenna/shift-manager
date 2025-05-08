@@ -1,5 +1,5 @@
 export const environment = {
-       pocketbaseUrl: 'https://pocketbase.eulab-dash.it/',
-       emailUrl: 'https://mailpdg.eulab-dash.it/send-email',
+       pocketbaseUrl: 'https://pocketbase.eulab.cloud/',
+       emailUrl: 'https://mailpdg.eulab.cloud/send-email',
 
 };
